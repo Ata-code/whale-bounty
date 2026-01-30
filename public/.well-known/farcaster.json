@@ -1,0 +1,31 @@
+{
+  "accountAssociation": {
+    "header": "",
+    "payload": "",
+    "signature": ""
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "Whale Bounty",
+    "homeUrl": "https://your-domain.com",
+    "iconUrl": "https://your-domain.com/icon.png",
+    "splashImageUrl": "https://your-domain.com/splash.png",
+    "splashBackgroundColor": "#020617",
+    "webhookUrl": "https://your-domain.com/api/webhook",
+    "subtitle": "Manage your portfolio and survive the whales",
+    "description": "A fast, fun way to manage your portfolio and survive the crypto whales on Base.",
+    "screenshotUrls": [
+      "https://your-domain.com/screenshot1.png",
+      "https://your-domain.com/screenshot2.png",
+      "https://your-domain.com/screenshot3.png"
+    ],
+    "primaryCategory": "social",
+    "tags": ["crypto", "game", "base", "miniapp"],
+    "heroImageUrl": "https://your-domain.com/hero.png",
+    "tagline": "Survive the whales",
+    "ogTitle": "Whale Bounty",
+    "ogDescription": "Manage your portfolio and survive the whales on Base.",
+    "ogImageUrl": "https://your-domain.com/og.png",
+    "noindex": true
+  }
+}

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import sdk from "@farcaster/miniapp-sdk";
+import { sdk } from "@farcaster/miniapp-sdk";
 import { CryptoCard, GameState, MarketEvent } from './types';
 import { CRYPTO_CARDS, INITIAL_HP, ICONS } from './constants';
 import { fetchMarketEvent } from './services/geminiService';
@@ -74,19 +74,12 @@ const App: React.FC = () => {
   useEffect(() => {
     let mounted = true;
     const init = async () => {
-      const timeout = new Promise((resolve) => setTimeout(() => resolve('timeout'), 1500));
+      await sdk.actions.ready();
       try {
-        await Promise.race([
-          (async () => {
-            const ctx = await sdk.context;
-            if (mounted) setContext(ctx);
-            await sdk.actions.ready();
-            return 'ready';
-          })(),
-          timeout
-        ]);
+        const ctx = await sdk.context;
+        if (mounted) setContext(ctx);
       } catch (e) {
-        console.warn("SDK initialization failed", e);
+        console.warn("SDK context failed", e);
       } finally {
         if (mounted) {
           setIsFrameReady(true);
