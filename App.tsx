@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import sdk from "@farcaster/frame-sdk";
+import sdk from "@farcaster/miniapp-sdk";
 import { CryptoCard, GameState, MarketEvent } from './types';
 import { CRYPTO_CARDS, INITIAL_HP, ICONS } from './constants';
 import { fetchMarketEvent } from './services/geminiService';
@@ -58,6 +58,12 @@ const App: React.FC = () => {
   useEffect(() => {
     musicRef.current = isMusicOn;
   }, [isMusicOn]);
+
+  function App() {
+    useEffect(() => {
+        sdk.actions.ready();
+    }, []);
+}
 
   useEffect(() => {
     if (historyEndRef.current) {
