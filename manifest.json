@@ -1,0 +1,17 @@
+
+{
+  "name": "Whale Bounty",
+  "short_name": "Whale Bounty",
+  "description": "A strategic card-based battle game on Base.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#0052FF",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

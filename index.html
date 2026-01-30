@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Whale Bounty</title>
+  
+  <!-- Base/Farcaster Mini App Meta Tags -->
+  <meta property="fc:frame" content='{"version":"next","imageUrl":"./icon.png","button":{"title":"Play Whale Bounty","action":{"type":"launch_frame","name":"Whale Bounty","url":"https://whale-wars.vercel.app/","splashImageUrl":"./icon.png","splashBackgroundColor":"#020617"}}}' />
+  <meta property="fc:frame:image:aspect_ratio" content="1:1" />
+  <meta property="og:title" content="Whale Bounty" />
+  <meta property="og:description" content="Manage your portfolio and survive the whales on Base." />
+  <meta property="og:image" content="./icon.png" />
+
+  <link rel="manifest" href="manifest.json" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background-color: #020617;
+      color: #f8fafc;
+      overflow: hidden;
+      margin: 0;
+      height: 100vh;
+      width: 100vw;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .crypto-glow {
+      box-shadow: 0 0 30px rgba(0, 82, 255, 0.2);
+    }
+    .base-blue { color: #0052FF; }
+    .bg-base-blue { background-color: #0052FF; }
+    
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.5; }
+      50% { transform: scale(1.05); opacity: 0.2; }
+      100% { transform: scale(0.95); opacity: 0.5; }
+    }
+    .market-pulse-ring {
+      animation: pulse-ring 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-shimmer {
+      0% { box-shadow: 0 0 0 0 rgba(0, 82, 255, 0.4); transform: scale(1); }
+      50% { box-shadow: 0 0 20px 10px rgba(0, 82, 255, 0); transform: scale(1.02); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 82, 255, 0); transform: scale(1); }
+    }
+    .market-pulse-update {
+      animation: pulse-shimmer 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes card-fly-up {
+      0% { transform: translateY(0) scale(1) rotate(0); opacity: 1; }
+      50% { transform: translateY(-150px) scale(1.2) rotate(5deg); opacity: 1; filter: brightness(1.5); }
+      100% { transform: translateY(-300px) scale(0.5) rotate(15deg); opacity: 0; }
+    }
+    .animate-card-play {
+      animation: card-fly-up 0.6s forwards cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100 !important;
+      pointer-events: none;
+    }
+
+    @keyframes card-fly-down {
+      0% { transform: translateY(0) scale(1) rotate(0); opacity: 1; }
+      50% { transform: translateY(150px) scale(1.2) rotate(-5deg); opacity: 1; filter: brightness(1.5); }
+      100% { transform: translateY(300px) scale(0.5) rotate(-15deg); opacity: 0; }
+    }
+    .animate-card-play-down {
+      animation: card-fly-down 0.6s forwards cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100 !important;
+      pointer-events: none;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.1);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #0052FF;
+      border-radius: 10px;
+    }
+
+    .custom-scrollbar-hidden::-webkit-scrollbar {
+      display: none;
+    }
+    .custom-scrollbar-hidden {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    
+    /* Smooth transitions for hand container height changes */
+    .hand-container {
+      transition: height 0.3s ease-out;
+    }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@19.0.0",
+      "react-dom": "https://esm.sh/react-dom@19.0.0",
+      "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+      "@google/genai": "https://esm.sh/@google/genai@1.38.0",
+      "@farcaster/frame-sdk": "https://esm.sh/@farcaster/frame-sdk@0.0.17",
+      "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+      "react/": "https://esm.sh/react@^19.2.4/"
+    }
+  }
+  </script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="./index.tsx"></script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

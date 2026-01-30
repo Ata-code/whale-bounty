@@ -1,0 +1,9 @@
+
+{
+  "version": "next",
+  "name": "Whale Bounty",
+  "iconUrl": "./icon.png",
+  "splashImageUrl": "./icon.png",
+  "splashBackgroundColor": "#020617",
+  "homeUrl": "/"
+}
