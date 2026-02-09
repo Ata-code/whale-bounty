@@ -4,10 +4,12 @@
  */
 
 import { createBaseAccountSDK } from '@base-org/account';
+import { SiweMessage } from 'siwe';
 import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
 
 const BASE_CHAIN_ID = '0x2105'; // Base Mainnet 8453
+const BASE_CHAIN_ID_DECIMAL = 8453;
 
 const usedNoncesKey = 'whale-bounty-used-nonces';
 
@@ -89,11 +91,10 @@ export async function signInWithBase(nonce: string): Promise<SignInResult> {
     params: [{ chainId: BASE_CHAIN_ID }],
   });
 
-  // 2. Connect and sign in with Ethereum
-  let accounts: Array<{
-    address: string;
-    capabilities?: { signInWithEthereum?: { message: string; signature: string } };
-  }>;
+  // 2. Connect and sign in with Ethereum (or fallback to personal_sign)
+  let address: string;
+  let message: string;
+  let signature: string;
 
   try {
     const result = await provider.request({
@@ -110,31 +111,24 @@ export async function signInWithBase(nonce: string): Promise<SignInResult> {
         },
       ],
     });
-    accounts = (result as { accounts: typeof accounts }).accounts;
+    const accounts = (result as { accounts: Array<{ address: string; capabilities?: { signInWithEthereum?: { message: string; signature: string } } } }).accounts;
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    if (message.includes('method_not_supported') || message.includes('not supported')) {
-      throw {
-        code: 'METHOD_NOT_SUPPORTED',
-        message: 'Wallet does not support Sign in with Base. Try Coinbase Wallet or Base in-app browser.',
-      } as AuthError;
+    const errMsg = err instanceof Error ? err.message : String(err);
+    if (errMsg.includes('method_not_supported') || errMsg.includes('not supported')) {
+      return signInWithSiweFallback(nonce, provider);
     }
     throw err;
   }
 
-  if (!accounts?.[0]) {
-    throw { code: 'NO_ACCOUNTS', message: 'No accounts returned' } as AuthError;
-  }
-
-  const account = accounts[0];
-  const { address } = account;
-  const signIn = account.capabilities?.signInWithEthereum;
-
-  if (!signIn?.message || !signIn?.signature) {
+  const account = accounts?.[0];
+  if (!account?.capabilities?.signInWithEthereum?.message || !account.capabilities.signInWithEthereum.signature) {
     throw { code: 'NO_SIGNATURE', message: 'Sign in with Ethereum was not completed' } as AuthError;
   }
+  address = account.address;
+  message = account.capabilities.signInWithEthereum.message;
+  signature = account.capabilities.signInWithEthereum.signature;
 
-  const nonceFromMessage = extractNonceFromMessage(signIn.message);
+  const nonceFromMessage = extractNonceFromMessage(message);
   if (!nonceFromMessage || nonceFromMessage !== nonce) {
     throw { code: 'INVALID_NONCE', message: 'Invalid nonce in message' } as AuthError;
   }
@@ -143,8 +137,8 @@ export async function signInWithBase(nonce: string): Promise<SignInResult> {
 
   const valid = await verifySignature({
     address: address as `0x${string}`,
-    message: signIn.message,
-    signature: signIn.signature as `0x${string}`,
+    message,
+    signature: signature as `0x${string}`,
   });
 
   if (!valid) {
@@ -153,7 +147,60 @@ export async function signInWithBase(nonce: string): Promise<SignInResult> {
 
   return {
     address: address as `0x${string}`,
-    message: signIn.message,
-    signature: signIn.signature as `0x${string}`,
+    message,
+    signature: signature as `0x${string}`,
+  };
+}
+
+/**
+ * Fallback SIWE flow using eth_requestAccounts + personal_sign.
+ * Used when wallet_connect is not supported (e.g. Base mini app embedded WebView).
+ */
+async function signInWithSiweFallback(
+  nonce: string,
+  provider: { request: (args: { method: string; params?: unknown[] }) => Promise<unknown> }
+): Promise<SignInResult> {
+  const accounts = await provider.request({ method: 'eth_requestAccounts', params: [] }) as string[];
+  const address = accounts?.[0];
+  if (!address) {
+    throw { code: 'NO_ACCOUNTS', message: 'No accounts returned' } as AuthError;
+  }
+
+  const domain = typeof window !== 'undefined' ? window.location.hostname : 'whale-bounty.vercel.app';
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://whale-bounty.vercel.app';
+
+  const siweMessage = new SiweMessage({
+    domain,
+    address: address as `0x${string}`,
+    statement: 'Sign in to Whale Bounty on Base.',
+    uri: origin,
+    version: '1',
+    chainId: BASE_CHAIN_ID_DECIMAL,
+    nonce,
+    issuedAt: new Date().toISOString(),
+  });
+
+  const messageToSign = siweMessage.prepareMessage();
+  const sig = await provider.request({
+    method: 'personal_sign',
+    params: [messageToSign, address],
+  }) as string;
+
+  addUsedNonce(nonce);
+
+  const valid = await verifySignature({
+    address: address as `0x${string}`,
+    message: messageToSign,
+    signature: sig as `0x${string}`,
+  });
+
+  if (!valid) {
+    throw { code: 'INVALID_SIGNATURE', message: 'Signature verification failed' } as AuthError;
+  }
+
+  return {
+    address: address as `0x${string}`,
+    message: messageToSign,
+    signature: sig as `0x${string}`,
   };
 }
