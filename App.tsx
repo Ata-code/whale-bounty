@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { sdk } from "@farcaster/miniapp-sdk";
 import { CryptoCard, GameState, MarketEvent } from './types';
@@ -7,22 +6,40 @@ import { fetchMarketEvent } from './services/geminiService';
 import { synth } from './services/audioService';
 import Card from './components/Card';
 import MarketPulse from './components/MarketPulse';
+import Lobby, { shortAddress } from './components/Lobby';
+
+const AUTH_STORAGE_KEY = 'whale-bounty-verified-address';
 
 const App: React.FC = () => {
   const [context, setContext] = useState<any>(null);
   const [isFrameReady, setIsFrameReady] = useState(false);
+  const [verifiedAddress, setVerifiedAddress] = useState<`0x${string}` | null>(() => {
+    try {
+      const stored = sessionStorage.getItem(AUTH_STORAGE_KEY);
+      return stored ? (stored as `0x${string}`) : null;
+    } catch {
+      return null;
+    }
+  });
   const [isMusicOn, setIsMusicOn] = useState(true);
   const musicRef = useRef(true);
   const [isLoadingEvent, setIsLoadingEvent] = useState(false);
   const [tutorialStep, setTutorialStep] = useState<number | null>(null);
   const [playedCardId, setPlayedCardId] = useState<string | null>(null);
   const [whalePlayedCardId, setWhalePlayedCardId] = useState<string | null>(null);
-  
+
   const [lastWhaleMove, setLastWhaleMove] = useState<string>("");
   const [lastPlayerMove, setLastPlayerMove] = useState<string>("");
   const [showHistory, setShowHistory] = useState(true);
 
   const historyEndRef = useRef<HTMLDivElement>(null);
+
+  const handleVerified = useCallback((address: `0x${string}`) => {
+    setVerifiedAddress(address);
+    try {
+      sessionStorage.setItem(AUTH_STORAGE_KEY, address);
+    } catch {}
+  }, []);
 
   const [gameState, setGameState] = useState<GameState>({
     playerHP: INITIAL_HP,
@@ -58,12 +75,6 @@ const App: React.FC = () => {
   useEffect(() => {
     musicRef.current = isMusicOn;
   }, [isMusicOn]);
-
-  function App() {
-    useEffect(() => {
-        sdk.actions.ready();
-    }, []);
-}
 
   useEffect(() => {
     if (historyEndRef.current) {
@@ -131,8 +142,8 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (isFrameReady) initGame();
-  }, [isFrameReady, initGame]);
+    if (isFrameReady && verifiedAddress) initGame();
+  }, [isFrameReady, verifiedAddress, initGame]);
 
   const toggleMusic = () => {
     const nextState = !isMusicOn;
@@ -270,6 +281,10 @@ const App: React.FC = () => {
     );
   }
 
+  if (!verifiedAddress) {
+    return <Lobby onVerified={handleVerified} />;
+  }
+
   return (
     <div className="h-screen flex flex-col bg-[#020617] text-slate-100 overflow-hidden relative">
       <div className="fixed inset-0 pointer-events-none opacity-[0.03] select-none flex flex-wrap gap-8 items-center justify-center">
@@ -306,10 +321,18 @@ const App: React.FC = () => {
           <button onClick={toggleMusic} className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs transition-colors border ${isMusicOn ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' : 'bg-slate-800 text-slate-500 border-slate-700'}`}>
             {isMusicOn ? '🔊' : '🔇'}
           </button>
-          {context?.user && (
+          {(context?.user || verifiedAddress) && (
             <div className="hidden xs:flex items-center gap-2 bg-slate-800/40 pr-3 pl-1 py-1 rounded-lg border border-white/5">
-              <img src={context.user.pfpUrl} className="w-7 h-7 rounded-lg border border-white/10" alt="pfp" />
-              <span className="text-[10px] mono font-bold text-slate-300">@{context.user.username}</span>
+              {context?.user ? (
+                <>
+                  <img src={context.user.pfpUrl} className="w-7 h-7 rounded-lg border border-white/10" alt="pfp" />
+                  <span className="text-[10px] mono font-bold text-slate-300">@{context.user.username}</span>
+                </>
+              ) : (
+                <span className="text-[10px] mono font-bold text-emerald-400/90" title={verifiedAddress!}>
+                  {shortAddress(verifiedAddress!)}
+                </span>
+              )}
             </div>
           )}
         </div>
