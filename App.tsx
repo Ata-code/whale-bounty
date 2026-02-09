@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { sdk } from "@farcaster/miniapp-sdk";
+import { useAccount } from 'wagmi';
 import { CryptoCard, GameState, MarketEvent } from './types';
 import { CRYPTO_CARDS, INITIAL_HP, ICONS } from './constants';
 import { fetchMarketEvent } from './services/geminiService';
@@ -7,13 +8,19 @@ import { synth } from './services/audioService';
 import Card from './components/Card';
 import MarketPulse from './components/MarketPulse';
 import Lobby, { shortAddress } from './components/Lobby';
+import Provider from './wagmi';
 
 const AUTH_STORAGE_KEY = 'whale-bounty-verified-address';
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
+  const { address: connectedAddress, isConnected } = useAccount();
   const [context, setContext] = useState<any>(null);
   const [isFrameReady, setIsFrameReady] = useState(false);
   const [verifiedAddress, setVerifiedAddress] = useState<`0x${string}` | null>(() => {
+    // Auto-set from connected wagmi account if available
+    if (connectedAddress) {
+      return connectedAddress as `0x${string}`;
+    }
     try {
       const stored = sessionStorage.getItem(AUTH_STORAGE_KEY);
       return stored ? (stored as `0x${string}`) : null;
@@ -102,6 +109,17 @@ const App: React.FC = () => {
     init();
     return () => { mounted = false; };
   }, []);
+
+  // Auto-connect with wagmi account
+  useEffect(() => {
+    if (isConnected && connectedAddress && !verifiedAddress) {
+      const address = connectedAddress as `0x${string}`;
+      setVerifiedAddress(address);
+      try {
+        sessionStorage.setItem(AUTH_STORAGE_KEY, address);
+      } catch {}
+    }
+  }, [isConnected, connectedAddress, verifiedAddress]);
 
   const drawCards = (count: number): CryptoCard[] => {
     const shuffled = [...CRYPTO_CARDS].sort(() => Math.random() - 0.5);
@@ -509,6 +527,14 @@ const App: React.FC = () => {
         </div>
       )}
     </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <Provider>
+      <AppContent />
+    </Provider>
   );
 };
 

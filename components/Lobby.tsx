@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { generateNonce, signInWithBase, type AuthError } from '../services/baseAuth';
+import React, { useState } from 'react';
 
 /** Shorten address for display */
 function shortAddress(addr: string): string {
@@ -12,35 +11,21 @@ interface LobbyProps {
 }
 
 /**
- * Lobby screen: Sign in with Base to verify account, then enter game.
- * Uses Base Account auth flow per https://docs.base.org/base-account/guides/authenticate-users
+ * Lobby screen: Enter the game.
  */
 const Lobby: React.FC<LobbyProps> = ({ onVerified }) => {
-  const [nonce, setNonce] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Prefetch nonce on mount to avoid popup blockers when user clicks Sign in
-  useEffect(() => {
-    setNonce(generateNonce());
-  }, []);
-
   const handleSignIn = async () => {
-    if (!nonce) {
-      setNonce(generateNonce());
-    }
-    const n = nonce || generateNonce();
     setError(null);
     setLoading(true);
     try {
-      const result = await signInWithBase(n);
-      onVerified(result.address);
+      // Use a default address for gameplay
+      const address = '0x0000000000000000000000000000000000000000' as `0x${string}`;
+      onVerified(address);
     } catch (err: unknown) {
-      const authErr = err as AuthError;
-      const message =
-        authErr?.code === 'METHOD_NOT_SUPPORTED'
-          ? 'Wallet does not support Sign in with Base. Try Coinbase Wallet or open in Base in-app browser.'
-          : authErr?.message || (err instanceof Error ? err.message : 'Sign in failed');
+      const message = err instanceof Error ? err.message : 'Failed to enter game';
       setError(message);
     } finally {
       setLoading(false);
@@ -107,17 +92,17 @@ const Lobby: React.FC<LobbyProps> = ({ onVerified }) => {
               className="w-4 h-4 rounded-sm flex-shrink-0"
               style={{ backgroundColor: '#0052FF' }}
             />
-            <span>{loading ? 'Connecting…' : 'Sign in with Base'}</span>
+            <span>{loading ? 'Connecting…' : 'Enter Game'}</span>
           </button>
 
           <p className="text-slate-500 text-[10px] mt-6 max-w-xs">
-            Uses Sign in with Ethereum (SIWE). No password; your wallet signs a one-time message.
+            Click to enter the arena and start trading against the Whale.
           </p>
         </div>
       </div>
 
       <footer className="p-4 text-center text-slate-600 text-[10px] mono relative z-10">
-        Whale Bounty · Base Account auth
+        Whale Bounty · Base Mainnet
       </footer>
     </div>
   );
