@@ -8,7 +8,7 @@
     "version": "1",
     "name": "Whale Bounty",
     "homeUrl": "https://whale-bounty.vercel.app/",
-    "iconUrl": "https://whale-bounty.vercel.app//public/ccc.png",
+    "iconUrl": "https://whale-bounty.vercel.app/public/ccc.png",
     "splashImageUrl": "https://your-domain.com/splash.png",
     "splashBackgroundColor": "#020617",
     "webhookUrl": "https://your-domain.com/api/webhook",
