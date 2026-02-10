@@ -8,7 +8,7 @@
     "version": "1",
     "name": "Whale Bounty",
     "homeUrl": "https://whale-bounty.vercel.app/",
-    "iconUrl": "https://whale-bounty.vercel.app/ccc.png",
+    "iconUrl": "https://whale-bounty.vercel.app//public/ccc.png",
     "splashImageUrl": "https://your-domain.com/splash.png",
     "splashBackgroundColor": "#020617",
     "webhookUrl": "https://your-domain.com/api/webhook",
@@ -25,7 +25,7 @@
     "tagline": "Survive the whales",
     "ogTitle": "Whale Bounty",
     "ogDescription": "Manage your portfolio and survive the whales on Base.",
-    "ogImageUrl": "https://whale-bounty.vercel.app/ccc.png",
+    "ogImageUrl": "https://whale-bounty.vercel.app/public/ccc.png",
     "noindex": true
   }
 }
