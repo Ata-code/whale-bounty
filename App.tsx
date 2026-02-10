@@ -162,8 +162,8 @@ const AppContent: React.FC = () => {
       ? `I just liquidated a Crypto Whale on Base! 🐋📈 #WhaleBounty #BaseMiniApp`
       : `Market volatility got me rekt! 📉💀 #WhaleBounty #BaseMiniApp`;
     // Open Twitter share in a new tab/window
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
-    window.open(twitterUrl, '_blank');
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+    sdk.actions.openUrl(url);
   };
 
   const handlePlayCard = async (card: CryptoCard) => {
