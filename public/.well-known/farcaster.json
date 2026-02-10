@@ -8,7 +8,7 @@
     "version": "1",
     "name": "Whale Bounty",
     "homeUrl": "https://your-domain.com",
-    "iconUrl": "https://your-domain.com/icon.png",
+    "iconUrl": "public/ccc.png",
     "splashImageUrl": "https://your-domain.com/splash.png",
     "splashBackgroundColor": "#020617",
     "webhookUrl": "https://your-domain.com/api/webhook",
