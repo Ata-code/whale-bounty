@@ -8,12 +8,13 @@ function shortAddress(addr: string): string {
 
 interface LobbyProps {
   onVerified: (address: `0x${string}`) => void;
+  connectedAddress?: `0x${string}` | null;
 }
 
 /**
  * Lobby screen: Enter the game.
  */
-const Lobby: React.FC<LobbyProps> = ({ onVerified }) => {
+const Lobby: React.FC<LobbyProps> = ({ onVerified, connectedAddress }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,8 +22,8 @@ const Lobby: React.FC<LobbyProps> = ({ onVerified }) => {
     setError(null);
     setLoading(true);
     try {
-      // Use a default address for gameplay
-      const address = '0x0000000000000000000000000000000000000000' as `0x${string}`;
+      // If wagmi provided a connected address, use it. Otherwise fall back to a default.
+      const address = (connectedAddress ?? '0x0000000000000000000000000000000000000000') as `0x${string}`;
       onVerified(address);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to enter game';

@@ -17,10 +17,6 @@ const AppContent: React.FC = () => {
   const [context, setContext] = useState<any>(null);
   const [isFrameReady, setIsFrameReady] = useState(false);
   const [verifiedAddress, setVerifiedAddress] = useState<`0x${string}` | null>(() => {
-    // Auto-set from connected wagmi account if available
-    if (connectedAddress) {
-      return connectedAddress as `0x${string}`;
-    }
     try {
       const stored = sessionStorage.getItem(AUTH_STORAGE_KEY);
       return stored ? (stored as `0x${string}`) : null;
@@ -110,16 +106,7 @@ const AppContent: React.FC = () => {
     return () => { mounted = false; };
   }, []);
 
-  // Auto-connect with wagmi account
-  useEffect(() => {
-    if (isConnected && connectedAddress && !verifiedAddress) {
-      const address = connectedAddress as `0x${string}`;
-      setVerifiedAddress(address);
-      try {
-        sessionStorage.setItem(AUTH_STORAGE_KEY, address);
-      } catch {}
-    }
-  }, [isConnected, connectedAddress, verifiedAddress]);
+  // NOTE: Do not auto-verify from wagmi. The player must click "Enter Game" to be verified.
 
   const drawCards = (count: number): CryptoCard[] => {
     const shuffled = [...CRYPTO_CARDS].sort(() => Math.random() - 0.5);
@@ -174,7 +161,7 @@ const AppContent: React.FC = () => {
     const text = gameState.winner === 'PLAYER' 
       ? `I just liquidated a Crypto Whale on Base! 🐋📈 #WhaleBounty #BaseMiniApp`
       : `Market volatility got me rekt! 📉💀 #WhaleBounty #BaseMiniApp`;
-    const url = `https://warpcast.com/~/compose?text=${encodeURIComponent(text)}`;
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
     sdk.actions.openUrl(url);
   };
 
@@ -300,7 +287,7 @@ const AppContent: React.FC = () => {
   }
 
   if (!verifiedAddress) {
-    return <Lobby onVerified={handleVerified} />;
+    return <Lobby onVerified={handleVerified} connectedAddress={connectedAddress ? (connectedAddress as `0x${string}`) : null} />;
   }
 
   return (
