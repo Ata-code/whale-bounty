@@ -319,13 +319,7 @@ const AppContent: React.FC = () => {
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           
-        <button 
-            onClick={() => setTutorialStep(0)}
-            className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-colors border ${tutorialStep !== null ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' : 'bg-slate-800 text-slate-500 border-slate-700'}`}
-            title="Replay Tutorial"
-            >
-            ❓
-          </button>
+        
           
           <button 
             onClick={() => setShowHistory(!showHistory)}
