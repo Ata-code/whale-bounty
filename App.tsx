@@ -34,7 +34,7 @@ const AppContent: React.FC = () => {
   const [lastWhaleMove, setLastWhaleMove] = useState<string>("");
   const [lastPlayerMove, setLastPlayerMove] = useState<string>("");
   const [showHistory, setShowHistory] = useState(true);
-  const [showLobbyOverlay, setShowLobbyOverlay] = useState(false);
+
   const historyEndRef = useRef<HTMLDivElement>(null);
 
   const handleVerified = useCallback((address: `0x${string}`) => {
@@ -313,7 +313,7 @@ const AppContent: React.FC = () => {
             />
           </div>
           <div>
-            <h1 className="z-20 bg-slate-900/90 backdrop-blur-xl border-b border-white/5 p-3 flex justify-between items-center shrink-0 cursor-pointer hover:bg-slate-800/90 transition-colors"onClick={() => setShowLobbyOverlay(true)}>Whale Bounty</h1>
+            <h1 className="text-sm font-black leading-none uppercase tracking-tighter text-blue-50">Whale Bounty</h1>
             <p className="text-[10px] text-blue-500/80 mono font-bold">Base Mainnet v1.0</p>
           </div>
         </div>
@@ -512,20 +512,6 @@ const AppContent: React.FC = () => {
                 ? 'Liquidity secured. You successfully outplayed the Base Whale and exited at the top.' 
                 : 'Margin call triggered. The whale dumped on your position and you were liquidated.'}
             </p>
-
-             {showLobbyOverlay && (
-                     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center">
-                       <div className="relative w-full h-full flex items-center justify-center">
-                                            <button
-                           onClick={() => setShowLobbyOverlay(false)}
-                           className="absolute top-4 right-4 z-10 w-10 h-10 rounded-lg flex items-center justify-center text-2xl hover:bg-white/10 transition-colors"
-                         >
-                             ✕
-                         </button>
-                         <Lobby onVerified={handleVerified} connectedAddress={connectedAddress ? (connectedAddress as `0x${string}`) : null} />
-                       </div>
-                     </div>
-                   )}
             <div className="space-y-4">
               <button onClick={initGame} className="w-full py-5 bg-[#0052FF] hover:bg-blue-500 rounded-2xl font-black transition-all uppercase tracking-widest text-white shadow-[0_10px_25px_rgba(0,82,255,0.4)] text-sm">
                 Restart Protocol
